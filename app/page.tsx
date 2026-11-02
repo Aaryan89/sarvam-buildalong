@@ -14,14 +14,31 @@ import {
   Building2,
   Sparkles,
   UploadCloud,
-  RotateCcw,
   Send,
   Scale,
   Languages,
   CheckCircle2,
   Loader2,
   AlertTriangle,
+  Printer,
+  Share2,
+  Paperclip,
+  Activity,
+  Calendar,
+  IndianRupee,
+  ChevronDown,
+  ChevronUp,
+  X,
+  VolumeX,
 } from "lucide-react";
+
+interface CitizenPlaybook {
+  statutory_sla_days: string;
+  escalation_authority: string;
+  required_attachments: string[];
+  application_fee: string;
+  submission_portal_url: string;
+}
 
 interface StructuredGrievance {
   detected_issue_summary: string;
@@ -29,14 +46,39 @@ interface StructuredGrievance {
   severity: "Critical" | "High" | "Medium";
   severity_justification: string;
   cpgrams_grievance_draft: string;
+  translated_grievance_native: string;
   rti_application_draft: string;
+  translated_rti_native: string;
   citizen_reassurance_native: string;
+  citizen_playbook: CitizenPlaybook;
+}
+
+interface PipelineTelemetry {
+  stt?: {
+    model: string;
+    latency_ms: number;
+    language_code: string;
+  };
+  llm: {
+    model: string;
+    latency_ms: number;
+    prompt_tokens?: number;
+    completion_tokens?: number;
+    total_tokens?: number;
+  };
+  tts?: {
+    model: string;
+    latency_ms: number;
+    audio_format: string;
+  };
+  total_latency_ms: number;
 }
 
 interface ProcessResult {
   transcript: string;
   structured_data: StructuredGrievance;
   audio_base64: string | null;
+  telemetry: PipelineTelemetry;
 }
 
 const LANGUAGES = [
@@ -53,19 +95,22 @@ const PRESETS = [
     title: "Ward 14 Burst Pipeline",
     lang: "hi-IN",
     badge: "Hindi • Jal Shakti",
-    text: "वार्ड 14, शांति नगर में मुख्य जलापूर्ति पाइपलाइन 3 दिनों से पूरी तरह टूट चुकी है। लाखों लीटर शुद्ध पेयजल सड़क पर बह रहा है, सड़क धंस रही है और घरों में सीवेज मिला गंदा पानी आ रहा है। स्थानीय जल बोर्ड को कई बार शिकायत की पर कोई सुनवाई नहीं हुई।",
+    priorRef: "जल बोर्ड शिकायत रसीद क्र. JAL-2026-9021 दिनांक 28-10-2026",
+    text: "वार्ड 14, शांति नगर में मुख्य जलापूर्ति पाइपलाइन 3 दिनों से पूरी तरह टूट चुकी है। लाखों लीटर शुद्ध पेयजल सड़क पर बह रहा है, जिससे सड़क धंस रही है और घरों में सीवेज मिला गंदा पानी आ रहा है। स्थानीय जल बोर्ड को रसीद क्र. JAL-2026-9021 के तहत शिकायत की थी परंतु आज तक कोई कार्रवाई नहीं हुई।",
   },
   {
     title: "Ration Grain Denial",
     lang: "mr-IN",
     badge: "Marathi • PDS",
-    text: "आमच्या गावातील रास्त भाव धान्य दुकानदाराने (राशन दुकान क्रमांक 42) अंत्योदय व बीपीएल कार्डधारकांना चालू महिन्याचे गहू आणि तांदूळ देण्यास नकार दिला आहे. पावत्या न देता नागरिकांना धमकावले जात आहे आणि धान्य काळ्या बाजारात विकले जात असल्याचा संशय आहे.",
+    priorRef: "तहसीलदार कार्यालयाकडे केलेली मागील तक्रार अर्ज क्र. PDS-MH-4421 दिनांक 15-10-2026",
+    text: "आमच्या गावातील रास्त भाव धान्य दुकानदाराने (राशन दुकान क्रमांक 42) अंत्योदय व बीपीएल कार्डधारकांना चालू महिन्याचे गहू आणि तांदूळ देण्यास नकार दिला आहे. मागील अर्ज क्र. PDS-MH-4421 वर कोणतीही कारवाई झाली नाही. पावत्या न देता नागरिकांना धमकावले जात आहे आणि काळ्या बाजारात धान्य विकले जात असल्याचा संशय आहे.",
   },
   {
     title: "Highway Pothole Hazard",
     lang: "ta-IN",
     badge: "Tamil • NHAI / PWD",
-    text: "செங்கல்பட்டு தேசிய நெடுஞ்சாலையில் (NH 45) பாலத்தின் அருகே சுமார் 3 அடி ஆழமுள்ள மிகப்பெரிய பள்ளம் உள்ளது. கடந்த ஒரு வாரத்தில் 4 இருசக்கர வாகன விபத்துகள் நடந்து பலர் படுகாயமடைந்துள்ளனர். PWD மற்றும் NHAI அதிகாரிகள் உடனடியாக அவசர சீரமைப்பு நடவடிக்கை எடுக்க வேண்டும்.",
+    priorRef: "NHAI புகார் குறிப்பு எண்: NHAI-TN-2026-1049 நாள் 22-10-2026",
+    text: "செங்கல்பட்டு தேசிய நெடுஞ்சாலையில் (NH 45) பாலத்தின் அருகே சுமார் 3 அடி ஆழமுள்ள மிகப்பெரிய பள்ளம் உள்ளது. முந்தைய புகார் எண் NHAI-TN-2026-1049 சமர்ப்பிக்கப்பட்டும் இதுவரை பழுதுபார்க்கப்படவில்லை. கடந்த ஒரு வாரத்தில் 4 விபத்துகள் நடந்து பலர் படுகாயமடைந்துள்ளனர். உடனடியாக அவசர நடவடிக்கை தேவை.",
   },
 ];
 
@@ -73,6 +118,8 @@ export default function AwazEShikayatPage() {
   const [selectedLang, setSelectedLang] = useState("hi-IN");
   const [textInput, setTextInput] = useState("");
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [evidenceFile, setEvidenceFile] = useState<File | null>(null);
+  const [evidenceNote, setEvidenceNote] = useState("");
 
   // Recording State
   const [isRecording, setIsRecording] = useState(false);
@@ -87,13 +134,35 @@ export default function AwazEShikayatPage() {
   const [result, setResult] = useState<ProcessResult | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Output UI State
+  // UI State: Tabs, Language Views, Telemetry Toggle
   const [activeTab, setActiveTab] = useState<"cpgrams" | "rti">("cpgrams");
+  const [cpgramsViewMode, setCpgramsViewMode] = useState<"english" | "native">("english");
+  const [rtiViewMode, setRtiViewMode] = useState<"english" | "native">("english");
+  const [showTelemetry, setShowTelemetry] = useState(true);
+
+  // Copy Feedback
   const [copiedCpgrams, setCopiedCpgrams] = useState(false);
   const [copiedRti, setCopiedRti] = useState(false);
-  const audioPlayerRef = useRef<HTMLAudioElement | null>(null);
+
+  // Read Aloud State
+  const [ttsLoading, setTtsLoading] = useState(false);
+  const [currentTtsAudio, setCurrentTtsAudio] = useState<string | null>(null);
+  const draftAudioRef = useRef<HTMLAudioElement | null>(null);
+  const autoAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Official Case ID & Timestamp
+  const [caseId, setCaseId] = useState("");
+  const [caseDate, setCaseDate] = useState("");
 
   useEffect(() => {
+    const randomHex = Math.random().toString(36).substring(2, 6).toUpperCase();
+    setCaseId(`AWSK-2026-${randomHex}`);
+    setCaseDate(new Date().toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    }));
+
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
     };
@@ -115,9 +184,7 @@ export default function AwazEShikayatPage() {
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunksRef.current, {
-          type: "audio/webm",
-        });
+        const audioBlob = new Blob(audioChunksRef.current, { type: "audio/webm" });
         const file = new File([audioBlob], `recording-${Date.now()}.webm`, {
           type: "audio/webm",
         });
@@ -131,10 +198,8 @@ export default function AwazEShikayatPage() {
       timerRef.current = setInterval(() => {
         setRecordingSeconds((prev) => prev + 1);
       }, 1000);
-    } catch (err: any) {
-      setError(
-        "Microphone access denied or not supported. You can type or use the instant 1-click sample presets below."
-      );
+    } catch {
+      setError("Microphone access denied. You can type or use the instant 1-click sample presets below.");
     }
   };
 
@@ -150,11 +215,13 @@ export default function AwazEShikayatPage() {
   const handleProcess = async (
     overrideText?: string,
     overrideLang?: string,
-    overrideAudio?: File | null
+    overrideAudio?: File | null,
+    overridePriorRef?: string
   ) => {
     const textToUse = overrideText !== undefined ? overrideText : textInput;
     const langToUse = overrideLang || selectedLang;
     const audioToUse = overrideAudio !== undefined ? overrideAudio : audioFile;
+    const priorRefToUse = overridePriorRef !== undefined ? overridePriorRef : evidenceNote;
 
     if (!textToUse.trim() && !audioToUse) {
       setError("Please record your voice, upload an audio file, or enter your complaint.");
@@ -164,6 +231,7 @@ export default function AwazEShikayatPage() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setCurrentTtsAudio(null);
 
     const formData = new FormData();
     formData.append("language_code", langToUse);
@@ -173,18 +241,24 @@ export default function AwazEShikayatPage() {
       setLoadingStep("1/3 Transcribing citizen voice via Sarvam Saaras v3...");
     } else {
       formData.append("text", textToUse);
-      setLoadingStep("1/3 Processing citizen complaint transcript...");
+      setLoadingStep("1/3 Parsing citizen complaint transcript & evidence...");
+    }
+
+    if (evidenceFile) {
+      formData.append("evidence", evidenceFile);
+    }
+    if (priorRefToUse.trim()) {
+      formData.append("evidence_note", priorRefToUse.trim());
     }
 
     try {
-      // Small simulated step update for UX transparency
       setTimeout(() => {
         setLoadingStep("2/3 Drafting CPGRAMS & RTI Legal Sections via Sarvam-105b...");
-      }, 1800);
+      }, 1600);
 
       setTimeout(() => {
         setLoadingStep("3/3 Synthesizing native voice reassurance via Sarvam Bulbul v3...");
-      }, 4200);
+      }, 3800);
 
       const response = await fetch("/api/process-grievance", {
         method: "POST",
@@ -199,13 +273,11 @@ export default function AwazEShikayatPage() {
 
       setResult(data);
 
-      // Auto play the returned Indic voice reassurance
+      // Auto-play the returned Indic voice reassurance
       if (data.audio_base64) {
         setTimeout(() => {
-          if (audioPlayerRef.current) {
-            audioPlayerRef.current.play().catch(() => {
-              // Browser autoplay policy might block silent initial play
-            });
+          if (autoAudioRef.current) {
+            autoAudioRef.current.play().catch(() => {});
           }
         }, 300);
       }
@@ -221,7 +293,9 @@ export default function AwazEShikayatPage() {
     setSelectedLang(preset.lang);
     setTextInput(preset.text);
     setAudioFile(null);
-    handleProcess(preset.text, preset.lang, null);
+    setEvidenceNote(preset.priorRef);
+    setEvidenceFile(null);
+    handleProcess(preset.text, preset.lang, null, preset.priorRef);
   };
 
   const copyToClipboard = (text: string, type: "cpgrams" | "rti") => {
@@ -245,6 +319,48 @@ export default function AwazEShikayatPage() {
     document.body.removeChild(element);
   };
 
+  // Synthesize Full Draft Aloud via /api/tts
+  const handleReadDraftAloud = async (text: string) => {
+    if (currentTtsAudio) {
+      // Toggle stop
+      setCurrentTtsAudio(null);
+      return;
+    }
+
+    setTtsLoading(true);
+    try {
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          text,
+          language_code: selectedLang,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "TTS failed");
+
+      if (data.audio_base64) {
+        setCurrentTtsAudio(data.audio_base64);
+        setTimeout(() => {
+          if (draftAudioRef.current) {
+            draftAudioRef.current.play().catch(() => {});
+          }
+        }, 150);
+      }
+    } catch (err: any) {
+      alert(`Audio read aloud error: ${err.message}`);
+    } finally {
+      setTtsLoading(false);
+    }
+  };
+
+  // Print Official PDF Form
+  const handlePrint = () => {
+    window.print();
+  };
+
   const formatSeconds = (sec: number) => {
     const m = Math.floor(sec / 60);
     const s = sec % 60;
@@ -262,10 +378,23 @@ export default function AwazEShikayatPage() {
     }
   };
 
+  // Generate WhatsApp Share URL
+  const generateWhatsAppShareUrl = () => {
+    if (!result) return "#";
+    const text = `🏛️ *Awaz-e-Shikayat Case File (${caseId})*\n\n` +
+      `*Department:* ${result.structured_data.cpgrams_department}\n` +
+      `*Urgency:* ${result.structured_data.severity}\n` +
+      `*Issue:* ${result.structured_data.detected_issue_summary}\n\n` +
+      `*Statutory SLA:* ${result.structured_data.citizen_playbook.statutory_sla_days}\n` +
+      `*Escalation:* ${result.structured_data.citizen_playbook.escalation_authority}\n\n` +
+      `*Next Action:* Submitted on CPGRAMS (https://pgportal.gov.in) & Section 6(1) RTI drafted.`;
+    return `https://wa.me/?text=${encodeURIComponent(text)}`;
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100/60 to-slate-200/50">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 via-slate-100/70 to-slate-200/50 print:bg-white print:text-black">
       {/* Top Civic Navigation Bar */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200 shadow-xs">
+      <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-xs print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="h-10 w-10 rounded-xl bg-gradient-to-tr from-amber-600 via-orange-500 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-orange-500/20 ring-2 ring-orange-200">
@@ -281,7 +410,7 @@ export default function AwazEShikayatPage() {
                 </span>
               </div>
               <p className="text-xs text-slate-500">
-                Indic Voice to CPGRAMS & RTI Legal Drafter • Powered by Sarvam AI
+                Grounded Indic Voice to CPGRAMS & RTI Legal Drafter • Sarvam AI
               </p>
             </div>
           </div>
@@ -289,7 +418,7 @@ export default function AwazEShikayatPage() {
           <div className="flex items-center space-x-3">
             <div className="hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-lg bg-slate-100 border border-slate-200 text-xs text-slate-600 font-medium">
               <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span>Sarvam AI Online</span>
+              <span>Sarvam AI Production Pipeline</span>
             </div>
             <a
               href="https://pgportal.gov.in/"
@@ -297,7 +426,7 @@ export default function AwazEShikayatPage() {
               rel="noreferrer"
               className="inline-flex items-center text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 transition-colors shadow-xs"
             >
-              CPGRAMS Portal
+              CPGRAMS
               <ExternalLink className="h-3 w-3 ml-1 text-slate-400" />
             </a>
           </div>
@@ -305,33 +434,34 @@ export default function AwazEShikayatPage() {
       </header>
 
       {/* Main Container */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 print:p-0 print:max-w-none">
         {/* Hero Section */}
-        <div className="text-center max-w-3xl mx-auto mb-8">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-orange-50 border border-orange-200/80 text-orange-800 text-xs font-semibold mb-3">
+        <div className="text-center max-w-3xl mx-auto mb-8 print:hidden">
+          <div className="inline-flex items-center space-x-2 px-3.5 py-1 rounded-full bg-orange-50 border border-orange-200 text-orange-800 text-xs font-semibold mb-3 shadow-2xs">
             <Sparkles className="h-3.5 w-3.5 text-orange-600" />
-            <span>Saaras v3 STT • Sarvam-105b LLM • Bulbul v3 TTS</span>
+            <span>Saaras v3 STT • Sarvam-105b Legal Engine • Bulbul v3 TTS</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-tight">
-            Speak Your Grievance in Any Indian Language.
+            Speak Your Grievance. Assert Your Constitutional Rights.
           </h1>
-          <p className="mt-2 text-base text-slate-600">
-            Get an instant, legally structured{" "}
-            <strong className="text-slate-900 font-semibold">CPGRAMS Portal Complaint</strong> and an enforceable{" "}
-            <strong className="text-slate-900 font-semibold">Section 6(1) RTI Application</strong> with voice reassurance.
+          <p className="mt-2 text-sm sm:text-base text-slate-600">
+            Convert spoken vernacular complaints and prior notices into an enforceable{" "}
+            <strong className="text-slate-900 font-semibold">CPGRAMS Petition</strong>, a formal{" "}
+            <strong className="text-slate-900 font-semibold">Section 6(1) RTI Application</strong>, and an actionable{" "}
+            <strong className="text-slate-900 font-semibold">Citizen Playbook</strong>.
           </p>
         </div>
 
         {/* 1-Click Demo Presets Bar */}
-        <div className="mb-8 bg-white border border-slate-200 rounded-2xl p-4 shadow-xs">
+        <div className="mb-8 bg-white border border-slate-200 rounded-2xl p-4 shadow-xs print:hidden">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-2">
               <Sparkles className="h-4 w-4 text-orange-600" />
               <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-                1-Click Live Demo Scenarios (Instant Evaluation)
+                1-Click Live Demo Scenarios (Grounded with Prior Notices)
               </span>
             </div>
-            <span className="text-xs text-slate-500">Click any preset to execute the full 3-step pipeline</span>
+            <span className="text-xs text-slate-500">Instant judge evaluation without a mic</span>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {PRESETS.map((preset, idx) => (
@@ -340,9 +470,9 @@ export default function AwazEShikayatPage() {
                 type="button"
                 onClick={() => loadPreset(preset)}
                 disabled={loading}
-                className="group text-left p-3.5 rounded-xl border border-slate-200 hover:border-orange-300 hover:bg-orange-50/40 bg-slate-50/50 transition-all shadow-2xs hover:shadow-sm"
+                className="group text-left p-3.5 rounded-xl border border-slate-200 hover:border-orange-300 hover:bg-orange-50/40 bg-slate-50/50 transition-all shadow-2xs hover:shadow-sm cursor-pointer"
               >
-                <div className="flex items-center justify-between mb-1.5">
+                <div className="flex items-center justify-between mb-1">
                   <span className="text-xs font-bold text-slate-900 group-hover:text-orange-700">
                     {preset.title}
                   </span>
@@ -350,6 +480,9 @@ export default function AwazEShikayatPage() {
                     {preset.badge}
                   </span>
                 </div>
+                <p className="text-[11px] text-amber-700 font-medium mb-1">
+                  📌 {preset.priorRef}
+                </p>
                 <p className="text-xs text-slate-600 line-clamp-2 italic">
                   &ldquo;{preset.text}&rdquo;
                 </p>
@@ -359,20 +492,20 @@ export default function AwazEShikayatPage() {
         </div>
 
         {/* Main Grid: Input & Output */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          {/* Left Column: Voice & Text Input */}
-          <div className="lg:col-span-5 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 print:block">
+          {/* Left Column: Voice, Evidence & Text Input */}
+          <div className="lg:col-span-5 space-y-6 print:hidden">
             <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
               {/* Language Selector Header */}
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                 <label className="flex items-center space-x-2 text-sm font-semibold text-slate-800">
                   <Languages className="h-4 w-4 text-orange-600" />
-                  <span>Select Citizen Language</span>
+                  <span>Citizen Indic Language</span>
                 </label>
                 <select
                   value={selectedLang}
                   onChange={(e) => setSelectedLang(e.target.value)}
-                  className="text-xs font-medium bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="text-xs font-semibold bg-slate-50 border border-slate-300 rounded-lg px-2.5 py-1.5 text-slate-800 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   {LANGUAGES.map((l) => (
                     <option key={l.code} value={l.code}>
@@ -392,17 +525,13 @@ export default function AwazEShikayatPage() {
                     type="button"
                     onClick={isRecording ? stopRecording : startRecording}
                     disabled={loading}
-                    className={`relative z-10 h-20 w-20 rounded-full flex flex-col items-center justify-center shadow-lg transition-all transform active:scale-95 ${
+                    className={`relative z-10 h-20 w-20 rounded-full flex flex-col items-center justify-center shadow-lg transition-all transform active:scale-95 cursor-pointer ${
                       isRecording
                         ? "bg-rose-600 hover:bg-rose-700 text-white ring-4 ring-rose-200"
                         : "bg-gradient-to-tr from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white ring-4 ring-orange-100 shadow-orange-500/30"
                     }`}
                   >
-                    {isRecording ? (
-                      <Square className="h-7 w-7" />
-                    ) : (
-                      <Mic className="h-8 w-8" />
-                    )}
+                    {isRecording ? <Square className="h-7 w-7" /> : <Mic className="h-8 w-8" />}
                   </button>
                 </div>
 
@@ -411,7 +540,7 @@ export default function AwazEShikayatPage() {
                     <div className="space-y-1">
                       <div className="text-sm font-bold text-rose-600 flex items-center justify-center space-x-2">
                         <span className="h-2.5 w-2.5 rounded-full bg-rose-600 animate-pulse"></span>
-                        <span>Recording Citizen Voice: {formatSeconds(recordingSeconds)}</span>
+                        <span>Recording: {formatSeconds(recordingSeconds)}</span>
                       </div>
                       <p className="text-xs text-slate-500">
                         Click square to stop and analyze with Saaras v3
@@ -426,7 +555,7 @@ export default function AwazEShikayatPage() {
                       <button
                         type="button"
                         onClick={() => setAudioFile(null)}
-                        className="text-[11px] text-slate-500 hover:text-rose-600 underline"
+                        className="text-[11px] text-slate-500 hover:text-rose-600 underline cursor-pointer"
                       >
                         Discard Recording
                       </button>
@@ -437,7 +566,7 @@ export default function AwazEShikayatPage() {
                         Click Microphone to Speak Your Complaint
                       </p>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        Speak naturally in your native language
+                        Speak naturally in your mother tongue
                       </p>
                     </div>
                   )}
@@ -447,7 +576,7 @@ export default function AwazEShikayatPage() {
                 <div className="mt-4 pt-3 border-t border-slate-200/80 flex items-center justify-center space-x-2 text-xs text-slate-600">
                   <label className="cursor-pointer inline-flex items-center space-x-1 text-orange-700 hover:text-orange-800 font-semibold">
                     <UploadCloud className="h-3.5 w-3.5" />
-                    <span>Upload Audio File (.wav, .mp3, .webm)</span>
+                    <span>Upload Voice Audio (.wav, .mp3, .webm)</span>
                     <input
                       type="file"
                       accept="audio/*"
@@ -461,17 +590,64 @@ export default function AwazEShikayatPage() {
                 </div>
               </div>
 
+              {/* Feature 1: Grounded RTI Mode — Prior Notice / Rejection Slip / Evidence Dropzone */}
+              <div className="mt-5 p-4 rounded-xl bg-slate-50/80 border border-slate-200 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-bold text-slate-800 flex items-center space-x-1.5">
+                    <Paperclip className="h-3.5 w-3.5 text-indigo-600" />
+                    <span>Grounded RTI: Attach Prior Notice / Receipt (Optional)</span>
+                  </label>
+                  {evidenceFile && (
+                    <button
+                      type="button"
+                      onClick={() => setEvidenceFile(null)}
+                      className="text-[10px] text-rose-600 hover:underline flex items-center"
+                    >
+                      <X className="h-3 w-3 mr-0.5" /> Remove
+                    </button>
+                  )}
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <label className="flex-1 cursor-pointer flex items-center justify-center space-x-2 p-2.5 rounded-lg border border-dashed border-slate-300 hover:border-indigo-400 bg-white hover:bg-indigo-50/20 text-xs font-medium text-slate-600 transition-colors">
+                    <UploadCloud className="h-4 w-4 text-indigo-500" />
+                    <span className="truncate">
+                      {evidenceFile ? evidenceFile.name : "Attach Receipt / Defect Photo / Rejection Slip"}
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/*,application/pdf,text/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) setEvidenceFile(file);
+                      }}
+                    />
+                  </label>
+                </div>
+
+                <div>
+                  <input
+                    type="text"
+                    value={evidenceNote}
+                    onChange={(e) => setEvidenceNote(e.target.value)}
+                    placeholder="Or enter Prior Receipt / Diary # (e.g., JAL-2026-9021 on 28-Oct-2026)"
+                    className="w-full text-xs p-2 rounded-lg border border-slate-200 bg-white text-slate-800 placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+
               {/* Text Fallback Section */}
               <div className="mt-5 space-y-2">
                 <div className="flex items-center justify-between">
                   <label className="text-xs font-semibold text-slate-700 uppercase tracking-wider">
-                    Or Enter Complaint Text
+                    Complaint Text
                   </label>
                   {textInput && (
                     <button
                       type="button"
                       onClick={() => setTextInput("")}
-                      className="text-[11px] text-slate-400 hover:text-slate-600"
+                      className="text-[11px] text-slate-400 hover:text-slate-600 cursor-pointer"
                     >
                       Clear
                     </button>
@@ -482,7 +658,7 @@ export default function AwazEShikayatPage() {
                   onChange={(e) => setTextInput(e.target.value)}
                   placeholder="आप अपनी समस्या यहाँ लिख भी सकते हैं (जैसे सड़क, पानी, राशन, अस्पताल)..."
                   rows={4}
-                  className="w-full text-xs sm:text-sm p-3 rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all placeholder:text-slate-400"
+                  className="w-full text-xs sm:text-sm p-3 rounded-xl border border-slate-200 bg-slate-50/60 focus:bg-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all placeholder:text-slate-400 text-slate-900"
                 />
               </div>
 
@@ -491,7 +667,7 @@ export default function AwazEShikayatPage() {
                 type="button"
                 onClick={() => handleProcess()}
                 disabled={loading || isRecording || (!textInput.trim() && !audioFile)}
-                className="mt-5 w-full flex items-center justify-center space-x-2 py-3 px-4 rounded-xl bg-slate-900 hover:bg-orange-600 text-white font-semibold text-sm shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                className="mt-5 w-full flex items-center justify-center space-x-2 py-3.5 px-4 rounded-xl bg-slate-950 hover:bg-orange-600 text-white font-semibold text-sm shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -501,7 +677,7 @@ export default function AwazEShikayatPage() {
                 ) : (
                   <>
                     <Send className="h-4 w-4" />
-                    <span>Generate CPGRAMS & RTI Legal Drafts</span>
+                    <span>Generate CPGRAMS, RTI & Action Playbook</span>
                   </>
                 )}
               </button>
@@ -526,40 +702,97 @@ export default function AwazEShikayatPage() {
                 </div>
               )}
             </div>
-
-            {/* Indian Civic Law Info Card */}
-            <div className="bg-white rounded-2xl border border-slate-200 p-4 text-xs text-slate-600 space-y-2">
-              <div className="font-bold text-slate-800 flex items-center space-x-1.5">
-                <Scale className="h-4 w-4 text-indigo-600" />
-                <span>Statutory Governance Standards</span>
-              </div>
-              <p>
-                <strong>CPGRAMS:</strong> Governed by the Department of Administrative Reforms & Public Grievances (DARPG). Mandates time-bound resolution (typically 30 days).
-              </p>
-              <p>
-                <strong>RTI Act 2005 (Section 6(1)):</strong> Provides citizens the legal right to inspect records and demand certified copies from Public Information Officers (PIOs).
-              </p>
-            </div>
           </div>
 
-          {/* Right Column: Output Workspace */}
+          {/* Right Column: Output Workspace & Inspector */}
           <div className="lg:col-span-7 space-y-6">
             {!result ? (
-              <div className="h-full min-h-[460px] flex flex-col items-center justify-center p-8 bg-white rounded-2xl border border-slate-200 text-center">
-                <div className="h-16 w-16 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 mb-4">
+              <div className="h-full min-h-[480px] flex flex-col items-center justify-center p-8 bg-white rounded-2xl border border-slate-200 text-center">
+                <div className="h-16 w-16 rounded-2xl bg-orange-100 flex items-center justify-center text-orange-600 mb-4 shadow-xs">
                   <FileText className="h-8 w-8" />
                 </div>
                 <h3 className="text-base font-bold text-slate-900">
-                  Legal Drafting Workspace
+                  Legal Drafting & RTI Inspection Workspace
                 </h3>
                 <p className="mt-1.5 text-xs text-slate-500 max-w-md">
-                  Record your voice or click one of the 1-click sample presets above to generate a submission-ready CPGRAMS draft, Section 6(1) RTI application, and native Indic voice reassurance.
+                  Record your voice or click one of the 1-click grounded presets above to generate a submission-ready CPGRAMS draft, Section 6(1) RTI application, bilingual review, and the complete Citizen Action Playbook.
                 </p>
               </div>
             ) : (
-              <div className="space-y-6 animate-fadeIn">
+              <div className="space-y-6">
+                {/* Feature 5: Sarvam AI Pipeline Telemetry — Judge's Inspector Bar */}
+                <div className="bg-slate-900 text-slate-100 rounded-2xl p-4 shadow-sm border border-slate-800 print:hidden">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Activity className="h-4 w-4 text-emerald-400" />
+                      <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                        Sarvam AI Pipeline Telemetry (Inspector)
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        Total Latency: {(result.telemetry.total_latency_ms / 1000).toFixed(2)}s
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setShowTelemetry(!showTelemetry)}
+                        className="text-slate-400 hover:text-white cursor-pointer"
+                      >
+                        {showTelemetry ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  {showTelemetry && (
+                    <div className="mt-3 pt-3 border-t border-slate-800 grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                      {/* Step 1: STT */}
+                      <div className="bg-slate-800/80 rounded-xl p-2.5 border border-slate-700/60">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400">
+                          <span>1. Speech-to-Text</span>
+                          <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+                        </div>
+                        <div className="text-xs font-mono font-bold text-slate-100 mt-1">
+                          {result.telemetry.stt?.model || "saaras:v3 (Native)"}
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">
+                          {result.telemetry.stt ? `${result.telemetry.stt.latency_ms} ms` : "Direct Text Mode"}
+                        </div>
+                      </div>
+
+                      {/* Step 2: LLM */}
+                      <div className="bg-slate-800/80 rounded-xl p-2.5 border border-slate-700/60">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400">
+                          <span>2. Legal Reasoning</span>
+                          <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+                        </div>
+                        <div className="text-xs font-mono font-bold text-slate-100 mt-1">
+                          {result.telemetry.llm.model}
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">
+                          {result.telemetry.llm.latency_ms} ms
+                          {result.telemetry.llm.total_tokens && ` • ${result.telemetry.llm.total_tokens} tokens`}
+                        </div>
+                      </div>
+
+                      {/* Step 3: TTS */}
+                      <div className="bg-slate-800/80 rounded-xl p-2.5 border border-slate-700/60">
+                        <div className="flex items-center justify-between text-[11px] text-slate-400">
+                          <span>3. Voice Synthesis</span>
+                          <span className="h-2 w-2 rounded-full bg-emerald-400"></span>
+                        </div>
+                        <div className="text-xs font-mono font-bold text-slate-100 mt-1">
+                          {result.telemetry.tts?.model || "bulbul:v3"}
+                        </div>
+                        <div className="text-[10px] text-slate-400 mt-0.5">
+                          {result.telemetry.tts?.latency_ms ? `${result.telemetry.tts.latency_ms} ms` : "Synthesized"}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* 1. Citizen Voice Feedback & Reassurance Banner */}
-                <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-indigo-700 text-white rounded-2xl p-5 shadow-md">
+                <div className="bg-gradient-to-r from-orange-600 via-amber-600 to-indigo-700 text-white rounded-2xl p-5 shadow-md print:hidden">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <Volume2 className="h-5 w-5 text-amber-200" />
@@ -581,7 +814,7 @@ export default function AwazEShikayatPage() {
                   {result.audio_base64 && (
                     <div className="mt-2 bg-black/20 backdrop-blur-xs rounded-xl p-2.5 flex items-center space-x-3">
                       <audio
-                        ref={audioPlayerRef}
+                        ref={autoAudioRef}
                         controls
                         src={`data:audio/wav;base64,${result.audio_base64}`}
                         className="w-full h-8"
@@ -589,12 +822,22 @@ export default function AwazEShikayatPage() {
                     </div>
                   )}
 
-                  {/* Original Transcript Accordion */}
                   <div className="mt-3 pt-3 border-t border-white/20 text-xs text-amber-50">
-                    <span className="font-semibold text-white">Recognized Complaint:</span>{" "}
+                    <span className="font-semibold text-white">Spoken Transcript:</span>{" "}
                     <span className="italic">{result.transcript}</span>
                   </div>
                 </div>
+
+                {/* Hidden Audio Player for "Read Draft Aloud" */}
+                {currentTtsAudio && (
+                  <audio
+                    ref={draftAudioRef}
+                    autoPlay
+                    src={`data:audio/wav;base64,${currentTtsAudio}`}
+                    onEnded={() => setCurrentTtsAudio(null)}
+                    className="hidden"
+                  />
+                )}
 
                 {/* 2. Department & Severity Badges Card */}
                 <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-xs flex flex-wrap items-center justify-between gap-4">
@@ -633,47 +876,133 @@ export default function AwazEShikayatPage() {
                   </div>
                 </div>
 
-                {/* 3. Side-by-Side / Tabbed Legal Drafts */}
-                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+                {/* Feature 3: Actionable Citizen Playbook Card */}
+                <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm space-y-4 print:hidden">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <Scale className="h-4 w-4 text-orange-600" />
+                      <span className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                        Citizen Action Playbook & Statutory Rights
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <a
+                        href={generateWhatsAppShareUrl()}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center space-x-1 text-xs font-semibold px-3 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white shadow-2xs transition-colors"
+                      >
+                        <Share2 className="h-3 w-3" />
+                        <span>WhatsApp Case File</span>
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="p-3 rounded-xl bg-orange-50/60 border border-orange-200/80">
+                      <div className="flex items-center space-x-1.5 text-xs font-bold text-orange-900 mb-1">
+                        <Calendar className="h-3.5 w-3.5 text-orange-600" />
+                        <span>Statutory SLA</span>
+                      </div>
+                      <p className="text-xs text-orange-800 font-medium">
+                        {result.structured_data.citizen_playbook.statutory_sla_days}
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-indigo-50/60 border border-indigo-200/80">
+                      <div className="flex items-center space-x-1.5 text-xs font-bold text-indigo-900 mb-1">
+                        <IndianRupee className="h-3.5 w-3.5 text-indigo-600" />
+                        <span>Statutory Fee</span>
+                      </div>
+                      <p className="text-xs text-indigo-800 font-medium">
+                        {result.structured_data.citizen_playbook.application_fee}
+                      </p>
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-slate-50 border border-slate-200">
+                      <div className="flex items-center space-x-1.5 text-xs font-bold text-slate-800 mb-1">
+                        <Building2 className="h-3.5 w-3.5 text-slate-600" />
+                        <span>Escalation Authority</span>
+                      </div>
+                      <p className="text-xs text-slate-700 font-medium line-clamp-2">
+                        {result.structured_data.citizen_playbook.escalation_authority}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Evidence Checklist */}
+                  <div className="pt-2">
+                    <div className="text-xs font-bold text-slate-700 mb-2">
+                      Mandatory Evidence Checklist (Verify Before Submitting):
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                      {result.structured_data.citizen_playbook.required_attachments.map((item, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-start space-x-2 p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs text-slate-700"
+                        >
+                          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                          <span>{item}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. Side-by-Side / Tabbed Legal Drafts with Bilingual Switcher & Audio */}
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden print:border-none print:shadow-none">
                   {/* Tabs Header */}
-                  <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/70 px-4 pt-2">
+                  <div className="flex items-center justify-between border-b border-slate-200 bg-slate-50/80 px-4 pt-2 print:hidden">
                     <div className="flex space-x-2">
                       <button
                         type="button"
                         onClick={() => setActiveTab("cpgrams")}
-                        className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-colors border-t-2 ${
+                        className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-colors border-t-2 cursor-pointer ${
                           activeTab === "cpgrams"
                             ? "bg-white text-orange-600 border-orange-500 shadow-2xs"
                             : "text-slate-600 hover:text-slate-900 border-transparent"
                         }`}
                       >
-                        1. CPGRAMS Formal Grievance
+                        1. CPGRAMS Grievance
                       </button>
                       <button
                         type="button"
                         onClick={() => setActiveTab("rti")}
-                        className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-colors border-t-2 ${
+                        className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-colors border-t-2 cursor-pointer ${
                           activeTab === "rti"
                             ? "bg-white text-indigo-600 border-indigo-500 shadow-2xs"
                             : "text-slate-600 hover:text-slate-900 border-transparent"
                         }`}
                       >
-                        2. Legal RTI Application (Sec 6(1))
+                        2. Section 6(1) RTI Application
                       </button>
                     </div>
 
                     <div className="flex items-center space-x-2 pb-2">
+                      {/* Feature 4: Official Print Button */}
+                      <button
+                        type="button"
+                        onClick={handlePrint}
+                        className="inline-flex items-center space-x-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-2xs cursor-pointer"
+                        title="Print / Save Official Court PDF"
+                      >
+                        <Printer className="h-3.5 w-3.5 text-slate-600" />
+                        <span>Print / Save PDF</span>
+                      </button>
+
                       {activeTab === "cpgrams" ? (
                         <>
                           <button
                             type="button"
                             onClick={() =>
                               copyToClipboard(
-                                result.structured_data.cpgrams_grievance_draft,
+                                cpgramsViewMode === "english"
+                                  ? result.structured_data.cpgrams_grievance_draft
+                                  : result.structured_data.translated_grievance_native,
                                 "cpgrams"
                               )
                             }
-                            className="inline-flex items-center space-x-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-2xs"
+                            className="inline-flex items-center space-x-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-2xs cursor-pointer"
                           >
                             {copiedCpgrams ? (
                               <Check className="h-3.5 w-3.5 text-emerald-600" />
@@ -686,11 +1015,11 @@ export default function AwazEShikayatPage() {
                             type="button"
                             onClick={() =>
                               downloadText(
-                                "CPGRAMS_Formal_Grievance_Draft.txt",
+                                `CPGRAMS_Grievance_${caseId}.txt`,
                                 result.structured_data.cpgrams_grievance_draft
                               )
                             }
-                            className="inline-flex items-center space-x-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-2xs"
+                            className="inline-flex items-center space-x-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-2xs cursor-pointer"
                           >
                             <Download className="h-3.5 w-3.5 text-slate-500" />
                             <span>Download</span>
@@ -702,11 +1031,13 @@ export default function AwazEShikayatPage() {
                             type="button"
                             onClick={() =>
                               copyToClipboard(
-                                result.structured_data.rti_application_draft,
+                                rtiViewMode === "english"
+                                  ? result.structured_data.rti_application_draft
+                                  : result.structured_data.translated_rti_native,
                                 "rti"
                               )
                             }
-                            className="inline-flex items-center space-x-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-2xs"
+                            className="inline-flex items-center space-x-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-2xs cursor-pointer"
                           >
                             {copiedRti ? (
                               <Check className="h-3.5 w-3.5 text-emerald-600" />
@@ -719,11 +1050,11 @@ export default function AwazEShikayatPage() {
                             type="button"
                             onClick={() =>
                               downloadText(
-                                "RTI_Section_6_1_Application.txt",
+                                `RTI_Section_6_1_${caseId}.txt`,
                                 result.structured_data.rti_application_draft
                               )
                             }
-                            className="inline-flex items-center space-x-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-2xs"
+                            className="inline-flex items-center space-x-1 text-xs font-semibold px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 shadow-2xs cursor-pointer"
                           >
                             <Download className="h-3.5 w-3.5 text-slate-500" />
                             <span>Download</span>
@@ -733,49 +1064,206 @@ export default function AwazEShikayatPage() {
                     </div>
                   </div>
 
+                  {/* Official Court Print Header (Visible only in Print / PDF Mode) */}
+                  <div className="hidden print:block p-8 border-b-2 border-black font-serif">
+                    <div className="flex justify-between items-start mb-6">
+                      <div>
+                        <h2 className="text-xl font-bold uppercase tracking-wider">
+                          {activeTab === "cpgrams"
+                            ? "FORMAL PUBLIC GRIEVANCE PETITION"
+                            : "APPLICATION UNDER SECTION 6(1) OF THE RTI ACT, 2005"}
+                        </h2>
+                        <p className="text-xs text-gray-700 mt-1">
+                          Standard Statutory Redressal Format • Governed by DARPG & Central Information Commission
+                        </p>
+                      </div>
+                      <div className="text-right text-xs">
+                        <div className="font-mono font-bold">Case Ref: {caseId}</div>
+                        <div>Date: {caseDate}</div>
+                        <div className="mt-2 border border-black p-2 text-[10px] inline-block font-sans">
+                          {activeTab === "rti"
+                            ? "[ Affix ₹10 Court Fee / IPO Stamp Here ]"
+                            : "[ CPGRAMS Portal Filing: Fee Exempt ]"}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="text-xs space-y-1 mb-4">
+                      <div><strong>To:</strong> Public Grievance Officer / Public Information Officer (PIO)</div>
+                      <div><strong>Department:</strong> {result.structured_data.cpgrams_department}</div>
+                      <div><strong>Urgency:</strong> {result.structured_data.severity} Urgency Level</div>
+                    </div>
+                  </div>
+
                   {/* Tab Body */}
                   <div className="p-6">
                     {activeTab === "cpgrams" ? (
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between text-xs text-slate-500">
-                          <span>
-                            Portal-Ready Submission Format • Standard DARPG Guidelines
-                          </span>
-                          <a
-                            href="https://pgportal.gov.in/Registration"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-orange-600 font-bold hover:underline inline-flex items-center"
-                          >
-                            Open pgportal.gov.in
-                            <ExternalLink className="h-3 w-3 ml-1" />
-                          </a>
+                        {/* Feature 2: Bilateral Transparency Controls for CPGRAMS */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-orange-50/70 border border-orange-200/80 print:hidden">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs font-bold text-slate-700">Language View:</span>
+                            <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-2xs">
+                              <button
+                                type="button"
+                                onClick={() => setCpgramsViewMode("english")}
+                                className={`text-xs px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                                  cpgramsViewMode === "english"
+                                    ? "bg-slate-900 text-white"
+                                    : "text-slate-600 hover:text-slate-900"
+                                }`}
+                              >
+                                Official English Draft
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setCpgramsViewMode("native")}
+                                className={`text-xs px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                                  cpgramsViewMode === "native"
+                                    ? "bg-orange-600 text-white"
+                                    : "text-slate-600 hover:text-slate-900"
+                                }`}
+                              >
+                                My Language (Native Script)
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleReadDraftAloud(
+                                  cpgramsViewMode === "native"
+                                    ? result.structured_data.translated_grievance_native
+                                    : result.structured_data.cpgrams_grievance_draft
+                                )
+                              }
+                              disabled={ttsLoading}
+                              className="inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-700 text-white shadow-2xs transition-all cursor-pointer"
+                            >
+                              {ttsLoading ? (
+                                <>
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                  <span>Synthesizing...</span>
+                                </>
+                              ) : currentTtsAudio ? (
+                                <>
+                                  <VolumeX className="h-3.5 w-3.5" />
+                                  <span>Stop Voice</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Volume2 className="h-3.5 w-3.5" />
+                                  <span>Read Draft Aloud (Bulbul v3)</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
                         </div>
-                        <pre className="font-mono text-xs sm:text-sm bg-slate-900 text-slate-100 p-5 rounded-xl whitespace-pre-wrap leading-relaxed overflow-x-auto shadow-inner selection:bg-orange-500">
-                          {result.structured_data.cpgrams_grievance_draft}
+
+                        {/* Pre-formatted Text */}
+                        <pre className="font-mono text-xs sm:text-sm bg-slate-950 text-slate-100 p-5 rounded-xl whitespace-pre-wrap leading-relaxed overflow-x-auto shadow-inner selection:bg-orange-500 print:bg-white print:text-black print:p-0 print:border-none print:shadow-none print:font-serif">
+                          {cpgramsViewMode === "english"
+                            ? result.structured_data.cpgrams_grievance_draft
+                            : result.structured_data.translated_grievance_native}
                         </pre>
                       </div>
                     ) : (
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between text-xs text-slate-500">
-                          <span>
-                            Legally Enforceable under Section 6(1) of the RTI Act, 2005
-                          </span>
-                          <a
-                            href="https://rtionline.gov.in/"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="text-indigo-600 font-bold hover:underline inline-flex items-center"
-                          >
-                            Open rtionline.gov.in
-                            <ExternalLink className="h-3 w-3 ml-1" />
-                          </a>
+                        {/* Feature 2: Bilateral Transparency Controls for RTI */}
+                        <div className="flex flex-wrap items-center justify-between gap-2 p-2.5 rounded-xl bg-indigo-50/70 border border-indigo-200/80 print:hidden">
+                          <div className="flex items-center space-x-2">
+                            <span className="text-xs font-bold text-slate-700">Language View:</span>
+                            <div className="inline-flex rounded-lg border border-slate-200 bg-white p-0.5 shadow-2xs">
+                              <button
+                                type="button"
+                                onClick={() => setRtiViewMode("english")}
+                                className={`text-xs px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                                  rtiViewMode === "english"
+                                    ? "bg-slate-900 text-white"
+                                    : "text-slate-600 hover:text-slate-900"
+                                }`}
+                              >
+                                Official English Section 6(1)
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setRtiViewMode("native")}
+                                className={`text-xs px-2.5 py-1 rounded-md font-semibold transition-all cursor-pointer ${
+                                  rtiViewMode === "native"
+                                    ? "bg-indigo-600 text-white"
+                                    : "text-slate-600 hover:text-slate-900"
+                                }`}
+                              >
+                                My Language (Native Script)
+                              </button>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center space-x-2">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleReadDraftAloud(
+                                  rtiViewMode === "native"
+                                    ? result.structured_data.translated_rti_native
+                                    : result.structured_data.rti_application_draft
+                                )
+                              }
+                              disabled={ttsLoading}
+                              className="inline-flex items-center space-x-1.5 text-xs font-bold px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shadow-2xs transition-all cursor-pointer"
+                            >
+                              {ttsLoading ? (
+                                <>
+                                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                  <span>Synthesizing...</span>
+                                </>
+                              ) : currentTtsAudio ? (
+                                <>
+                                  <VolumeX className="h-3.5 w-3.5" />
+                                  <span>Stop Voice</span>
+                                </>
+                              ) : (
+                                <>
+                                  <Volume2 className="h-3.5 w-3.5" />
+                                  <span>Read Draft Aloud (Bulbul v3)</span>
+                                </>
+                              )}
+                            </button>
+                          </div>
                         </div>
-                        <pre className="font-mono text-xs sm:text-sm bg-slate-900 text-slate-100 p-5 rounded-xl whitespace-pre-wrap leading-relaxed overflow-x-auto shadow-inner selection:bg-indigo-500">
-                          {result.structured_data.rti_application_draft}
+
+                        {/* Pre-formatted Text */}
+                        <pre className="font-mono text-xs sm:text-sm bg-slate-950 text-slate-100 p-5 rounded-xl whitespace-pre-wrap leading-relaxed overflow-x-auto shadow-inner selection:bg-indigo-500 print:bg-white print:text-black print:p-0 print:border-none print:shadow-none print:font-serif">
+                          {rtiViewMode === "english"
+                            ? result.structured_data.rti_application_draft
+                            : result.structured_data.translated_rti_native}
                         </pre>
                       </div>
                     )}
+                  </div>
+
+                  {/* Official Print Verification & Signature Footer (Print mode only) */}
+                  <div className="hidden print:block p-8 border-t-2 border-black font-serif text-xs">
+                    <div className="grid grid-cols-2 gap-8 mb-8">
+                      <div>
+                        <strong>Statutory Verification:</strong>
+                        <p className="mt-1 text-gray-700">
+                          I hereby verify and declare that the facts stated in this application are true to the best of my personal knowledge and belief, and no material information has been concealed.
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <div className="h-16 border-b border-dashed border-black"></div>
+                        <div className="mt-1 font-bold">Signature / Thumb Impression of Citizen</div>
+                        <div className="text-[10px] text-gray-600">Applicant / Authorized Representative</div>
+                      </div>
+                    </div>
+
+                    <div className="border border-black p-3 text-[10px] flex justify-between items-center">
+                      <span>Verification Hash: {caseId} • Generated via Awaz-e-Shikayat</span>
+                      <span>Citizen Grievance Redressal Mechanism</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -785,13 +1273,13 @@ export default function AwazEShikayatPage() {
       </main>
 
       {/* Footer */}
-      <footer className="mt-16 border-t border-slate-200 bg-white py-6">
+      <footer className="mt-16 border-t border-slate-200 bg-white py-6 print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-slate-500 space-y-1">
-          <p className="font-medium text-slate-700">
+          <p className="font-semibold text-slate-800">
             Awaz-e-Shikayat • Built for Sarvam AI Hackathon
           </p>
           <p>
-            Zero-friction citizen empowerment bridging vernacular voices to Indian Administrative Justice.
+            Bridging vernacular voices directly into Indian Administrative Justice through Saaras v3, Sarvam-105b, and Bulbul v3.
           </p>
         </div>
       </footer>
